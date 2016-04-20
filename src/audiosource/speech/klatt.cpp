@@ -11,6 +11,10 @@
 #define NULL 0
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wmissing-braces" // warning : suggest braces aronud initialization of subobject
+#endif
+
 class Interp
 {
 public:
