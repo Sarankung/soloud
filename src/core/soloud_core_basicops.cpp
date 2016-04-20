@@ -118,7 +118,7 @@ namespace SoLoud
 			mLastClockedTime = aSoundTime;
 		unlockAudioMutex();
 		int samples = 0;
-		if (lasttime != 0)
+		if (aSoundTime > lasttime)
 		{
 			samples = (int)floor((aSoundTime - lasttime) * mSamplerate);
 		}
