@@ -31,6 +31,10 @@ freely, subject to the following restrictions:
 #include <math.h>
 #include "soloud_vic.h"
 
+#ifdef _MSC_VER
+#pragma warning (disable: 4146) // unary minus operator applied to unsigned type, result still unsigned  // used by (-lsb) construct to turn 0 into 0 and 1 into 0xFFFF
+#endif
+
 namespace SoLoud
 {
 
