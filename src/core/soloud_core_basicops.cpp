@@ -83,9 +83,13 @@ namespace SoLoud
 		{
 			setVoiceVolume(ch, aVolume);
 		}
+		int i;
+		for (i = 0; i < MAX_CHANNELS; i++)
+		{
+			mVoice[ch]->mCurrentChannelVolume[i] = mVoice[ch]->mChannelVolume[i] * mVoice[ch]->mOverallVolume;		
+		}
 		setVoiceRelativePlaySpeed(ch, 1);
 
-		int i;
 		for (i = 0; i < FILTERS_PER_STREAM; i++)
 		{
 			if (aSound.mFilter[i])
