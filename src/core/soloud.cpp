@@ -414,6 +414,25 @@ namespace SoLoud
 		}
 #endif
 
+#if defined(WITH_PS4)
+		if (!inited &&
+			(aBackend == Soloud::PS4 ||
+			aBackend == Soloud::AUTO))
+		{
+			if (aBufferSize == Soloud::AUTO) buffersize = 4096;
+
+			int ret = ps4_init(this, aFlags, samplerate, buffersize, aChannels);
+			if (ret == 0)
+			{
+				inited = 1;
+				mBackendID = Soloud::PS4;
+			}
+
+			if (ret != 0 && aBackend != Soloud::AUTO)
+				return ret;			
+		}
+#endif
+
 #if defined(WITH_NULL)
 		if (!inited &&
 			(aBackend == Soloud::NULLDRIVER))

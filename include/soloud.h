@@ -136,6 +136,7 @@ namespace SoLoud
 			OPENAL,
 			COREAUDIO,
 			OPENSLES,
+			PS4,
 			NULLDRIVER,
 			BACKEND_MAX,
 		};
