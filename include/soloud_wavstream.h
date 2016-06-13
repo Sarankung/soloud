@@ -65,6 +65,7 @@ namespace SoLoud
 		unsigned int mDataOffset;
 		unsigned int mBits;
 		unsigned int mSampleCount;
+		unsigned int mLoopPointSample;
 
 		WavStream();
 		virtual ~WavStream();
@@ -75,6 +76,7 @@ namespace SoLoud
 		result loadFileToMem(File *aFile);		
 		virtual AudioSourceInstance *createInstance();
 		time getLength();
+		void setLoopPointSample(unsigned int aSample);
 	public:
 		result parse(File *aFile);
 	};

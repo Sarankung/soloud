@@ -203,12 +203,15 @@ namespace SoLoud
 				mOffset += b;
 				offset += b;
 				mOggFrameOffset += b;
-				if (mOffset >= mParent->mSampleCount)
+				if (mOffset >= mParent->mSampleCount || b == 0)
 				{
 					if (mFlags & AudioSourceInstance::LOOPING)
 					{
-						stb_vorbis_seek_start(mOgg);
-						mOffset = aSamples - offset;
+						if (mParent->mLoopPointSample > 0)
+							stb_vorbis_seek(mOgg, mParent->mLoopPointSample);
+						else
+							stb_vorbis_seek_start(mOgg);
+						mOffset = mParent->mLoopPointSample+1;
 						mLoopCount++;
 					}
 					else
@@ -236,9 +239,12 @@ namespace SoLoud
 			{
 				if (mFlags & AudioSourceInstance::LOOPING)
 				{
-					mFile->seek(mParent->mDataOffset);
+					//if (mParent->mLoopPointSample > 0)
+						mFile->seek(mParent->mDataOffset + ((mParent->mLoopPointSample * mParent->mBits * mParent->mChannels) >> 3));
+					//else
+					//	mFile->seek(mParent->mDataOffset);
 					getWavData(mFile, aBuffer + copysize, aSamples - copysize, aSamples, channels, mParent->mChannels, mParent->mBits);
-					mOffset = aSamples - copysize;
+					mOffset = 0;
 					mLoopCount++;
 				}
 				else
@@ -286,6 +292,7 @@ namespace SoLoud
 	{
 		mFilename = 0;
 		mSampleCount = 0;
+		mLoopPointSample = 0;
 		mOgg = 0;
 		mDataOffset = 0;
 		mBits = 0;
@@ -547,6 +554,11 @@ namespace SoLoud
 		if (mBaseSamplerate == 0)
 			return 0;
 		return mSampleCount / mBaseSamplerate;
+	}
+
+	void WavStream::setLoopPointSample(unsigned int aSample)
+	{
+		mLoopPointSample = aSample;
 	}
 
 };
