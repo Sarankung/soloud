@@ -142,6 +142,9 @@ namespace SoLoud
 		mMaxActiveVoices = 16;
 		mHighestVoice = 0;
 		mActiveVoiceDirty = true;
+
+		mRecording = NULL;
+		mRecordingSamples = 0;
 	}
 
 	Soloud::~Soloud()
@@ -1297,6 +1300,23 @@ namespace SoLoud
 				}
 			}
 		}
+
+		// Record data if needed
+		if (mRecording)
+		{
+			// Resize buffer if necessary
+			if (mRecordingSamples + (aSamples * mChannels) > mRecordingBufferSize)
+			{
+				mRecordingBufferSize *= 2;
+				mRecording = (float *)realloc(mRecording, mRecordingBufferSize * sizeof(float));
+			}
+
+			// Save data
+			int j;
+			for (i = 0; i < aSamples; i++)
+				for (j = 0; j < mChannels; j++)
+					mRecording[mRecordingSamples++] = aBuffer[i + j * aSamples];
+		}
 	}
 
 	void Soloud::calcActiveVoices()
@@ -1383,6 +1403,35 @@ namespace SoLoud
 			left = len;                  
 			len = stack[--pos];          
 		}		
+	}
+
+	void Soloud::startRecording()
+	{
+		// Lock audio
+		lockAudioMutex();
+
+		// Allocate recording buffer worth 10 seconds
+		mRecordingBufferSize = mSamplerate * mChannels * 10;
+		mRecording = (float *)calloc(mRecordingBufferSize, sizeof(float));
+		mRecordingSamples = 0;
+
+		// Unlock audio
+		unlockAudioMutex();
+	}
+
+	void Soloud::stopRecording()
+	{
+		// Lock audio
+		lockAudioMutex();
+
+		// Free recording
+		free(mRecording);
+		mRecording = NULL;
+		mRecordingBufferSize = 0;
+		mRecordingSamples = 0;
+
+		// Unlock audio
+		unlockAudioMutex();
 	}
 
 	void Soloud::mix_internal(unsigned int aSamples)
@@ -1487,6 +1536,8 @@ namespace SoLoud
 		}
 		
 		mixBus(mOutputScratch.mData, aSamples, mScratch.mData, 0, (float)mSamplerate, mChannels);
+
+		
 
 		for (i = 0; i < FILTERS_PER_STREAM; i++)
 		{
