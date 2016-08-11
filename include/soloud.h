@@ -473,6 +473,15 @@ namespace SoLoud
 		void lockAudioMutex();
 		// Unlock audio thread mutex.
 		void unlockAudioMutex();
+
+		// Recording functions/variables
+		void prepareRecording(unsigned int duration, unsigned int *bufferSize);
+		void startRecording();
+		void stopRecording();
+		void getRecording(float *buffer, unsigned int *numSamples);
+		float *mRecording;
+		unsigned int mRecordingBufferSize;
+		unsigned int mRecordingSamples;
 	};
 };
 
