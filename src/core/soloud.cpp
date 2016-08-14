@@ -1304,10 +1304,9 @@ namespace SoLoud
 		// Record data if needed
 		if (mRecording)
 		{
-			int j;
-			for (i = 0; i < aSamples; i++)
-				for (j = 0; j < mChannels; j++)
-					if (mRecordingSamples < mRecordingBufferSize)
+			for (int i = 0; i < aSamples; i++)
+				for (int j = 0; j < mChannels; j++)
+					if (mRecordingSamples * sizeof(float) < mRecordingBufferSize)
 						mRecording[mRecordingSamples++] = aBuffer[i + j * aSamples];
 		}
 	}
