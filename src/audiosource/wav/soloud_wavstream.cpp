@@ -279,6 +279,17 @@ namespace SoLoud
 		return 0;
 	}
 
+	void WavStreamInstance::seek(time aSeconds, float *mScratch, unsigned int mScratchSize)
+	{
+		if (mOgg)
+		{
+			unsigned int sample_number = (unsigned int)(aSeconds * mParent->mBaseSamplerate);
+			stb_vorbis_seek(mOgg, sample_number);
+			return;
+		}
+		AudioSourceInstance::seek(aSeconds, mScratch, mScratchSize);
+	}
+
 	bool WavStreamInstance::hasEnded()
 	{
 		if (mOffset >= mParent->mSampleCount && !(mFlags & AudioSourceInstance::LOOPING))

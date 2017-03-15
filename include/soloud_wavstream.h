@@ -49,6 +49,7 @@ namespace SoLoud
 		WavStreamInstance(WavStream *aParent);
 		virtual void getAudio(float *aBuffer, unsigned int aSamples);
 		virtual result rewind();
+		virtual void seek(time aSeconds, float *mScratch, unsigned int mScratchSize);
 		virtual bool hasEnded();
 		virtual ~WavStreamInstance();
 	};
