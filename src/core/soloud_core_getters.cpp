@@ -284,7 +284,8 @@ namespace SoLoud
 				lowest_play_index = i;
 			}
 		}
-		stopVoice(lowest_play_index);
+        if (lowest_play_index >= 0)
+    		stopVoice(lowest_play_index);
 		return lowest_play_index;
 	}
 
