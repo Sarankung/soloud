@@ -37,7 +37,7 @@ namespace SoLoud
 
 #else
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined (__APPLE__)
 #include "SDL.h"
 #else
 #include "SDL2/SDL.h"
