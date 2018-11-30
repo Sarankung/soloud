@@ -37,7 +37,7 @@ namespace SoLoud
 
 #else
 
-#if defined(_MSC_VER) || defined (__APPLE__)
+#if defined(_MSC_VER) || defined (__APPLE__) || defined (__ANDROID__)
 #include "SDL.h"
 #else
 #include "SDL2/SDL.h"
