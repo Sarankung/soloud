@@ -65,7 +65,12 @@ namespace SoLoud
 			unsigned int i;
 			for (i = 0; i < channels; i++)
 			{
+#ifndef SOLOUD_USE_PCM_S16
 				memcpy(aBuffer + i * aSamples + written, mParent->mData + mOffset + i * mParent->mSampleCount, sizeof(float) * copysize);
+#else
+				for (int j = 0 ; j < copysize ; j++)
+					aBuffer[i * aSamples + written + j] = mParent->mData[mOffset + i * mParent->mSampleCount + j] / (float)0x8000;
+#endif
 			}
 
 			written += copysize;
@@ -188,7 +193,7 @@ namespace SoLoud
 		
 		int samples = (subchunk2size / (bitspersample / 8)) / channels;
 		
-		mData = new float[samples * readchannels];
+		mData = new PCM_SAMPLE_TYPE[samples * readchannels];
 		
 		int i, j;
 		if (bitspersample == 8)
@@ -199,13 +204,21 @@ namespace SoLoud
 				{
 					if (j == 0)
 					{
+#ifndef SOLOUD_USE_PCM_S16
 						mData[i] = ((signed)aReader->read8() - 128) / (float)0x80;
-					}
+#else
+                        mData[i] = ((signed)aReader->read8()) << 8;
+#endif
+                    }
 					else
 					{
 						if (readchannels > 1 && j == 1)
 						{
+#ifndef SOLOUD_USE_PCM_S16
 							mData[i + samples] = ((signed)aReader->read8() - 128) / (float)0x80;
+#else
+                            mData[i + samples] = ((signed)aReader->read8()) << 8;
+#endif
 						}
 						else
 						{
@@ -224,14 +237,22 @@ namespace SoLoud
 				{
 					if (j == 0)
 					{
+#ifndef SOLOUD_USE_PCM_S16
 						mData[i] = ((signed short)aReader->read16()) / (float)0x8000;
-					}
+#else
+                        mData[i] = (signed short)aReader->read16();
+#endif
+                    }
 					else
 					{
 						if (readchannels > 1 && j == 1)
 						{
+#ifndef SOLOUD_USE_PCM_S16
 							mData[i + samples] = ((signed short)aReader->read16()) / (float)0x8000;
-						}
+#else
+                            mData[i + samples] = (signed short)aReader->read16();
+#endif
+                        }
 						else
 						{
 							aReader->read16();
@@ -258,13 +279,15 @@ namespace SoLoud
 			readchannels = 2;
 			mChannels = 2;
 		}
-		mData = new float[samples * readchannels];
+		mData = new PCM_SAMPLE_TYPE[samples * readchannels];
 		mSampleCount = samples;
 		samples = 0;
+        int n;
+#ifndef SOLOUD_USE_PCM_S16
 		while(1)
 		{
 			float **outputs;
-            int n = stb_vorbis_get_frame_float(aVorbis, NULL, &outputs);
+            n = stb_vorbis_get_frame_float(aVorbis, NULL, &outputs);
 			if (n == 0)
             {
 				break;
@@ -280,9 +303,26 @@ namespace SoLoud
 			}
 			samples += n;
 		}
+#else
+        short *outputs[2];
+        outputs[0] = new short[mSampleCount];
+        outputs[1] = new short[mSampleCount];
+        n = stb_vorbis_get_samples_short(aVorbis, readchannels, outputs, mSampleCount);
+        if (readchannels == 1)
+        {
+            memcpy(mData + samples, outputs[0],sizeof(short) * n);
+        }
+        else
+        {
+            memcpy(mData + samples, outputs[0],sizeof(short) * n);
+            memcpy(mData + samples + mSampleCount, outputs[1],sizeof(short) * n);
+        }
+        delete[] outputs[0];
+        delete[] outputs[1];
+#endif
         stb_vorbis_close(aVorbis);
 
-		return 0;
+        return 0;
 	}
 
     result Wav::testAndLoadFile(File *aReader)

@@ -63,6 +63,19 @@ freely, subject to the following restrictions:
 // 1)mono, 2)stereo 4)quad 6)5.1
 #define MAX_CHANNELS 6
 
+// Mobile devices prefer PCM as S16 and not float
+#if __APPLE__
+#include "TargetConditionals.h"
+#endif
+#if (TARGET_OS_IPHONE) || (TARGET_OS_TV) || defined(__ANDROID__)
+#define SOLOUD_USE_PCM_S16
+#endif
+
+#ifdef SOLOUD_USE_PCM_S16
+typedef signed short    PCM_SAMPLE_TYPE;
+#else
+typedef float           PCM_SAMPLE_TYPE;
+#endif
 //
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////

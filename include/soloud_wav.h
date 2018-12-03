@@ -51,7 +51,7 @@ namespace SoLoud
 		result loadogg(stb_vorbis *aVorbis);
 		result testAndLoadFile(File *aReader);
 	public:
-		float *mData;
+		PCM_SAMPLE_TYPE *mData;
 		unsigned int mSampleCount;
 
 		Wav();
